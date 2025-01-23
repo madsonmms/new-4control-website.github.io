@@ -1089,6 +1089,8 @@ section,
 # Services Section
 --------------------------------------------------------------*/
 .services .img {
+  max-height: 312px;
+  max-width: 415px;
   border-radius: 8px;
   overflow: hidden;
 }
