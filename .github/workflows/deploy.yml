@@ -1,0 +1,31 @@
+name: Deploy to HostGator
+
+on:
+  push:
+    branches: [ "prod" ]   # sua branch principal
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Start SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Deploy via rsync
+        run: |
+          RSYNC_RSH="ssh -p ${SSH_PORT:-22} -o StrictHostKeyChecking=no"
+          rsync -avz --delete \
+            --exclude ".git" --exclude ".github" \
+            -e "$RSYNC_RSH" ./ \
+            "${SSH_USER}@${SSH_HOST}:${DEPLOY_PATH}"
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
